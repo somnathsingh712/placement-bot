@@ -3,7 +3,7 @@ import { Link, Navigate, Route, Routes } from "react-router-dom";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 
-const API = "http://127.0.0.1:8000";
+const API = "https://placement-bot-backend5.onrender.com";
 const CHAT_HISTORY_KEY = "placement-ai-chat-history-v1";
 const THEME_KEY = "placement-ai-theme-v1";
 
