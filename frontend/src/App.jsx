@@ -5,6 +5,19 @@ import DOMPurify from "dompurify";
 
 const API = "http://127.0.0.1:8000";
 const CHAT_HISTORY_KEY = "placement-ai-chat-history-v1";
+const THEME_KEY = "placement-ai-theme-v1";
+
+function getInitialTheme() {
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    if (stored === "light" || stored === "dark") {
+      return stored;
+    }
+  } catch {
+    // Ignore storage errors and fallback to system preference.
+  }
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 function escapeHtml(text) {
   return text
@@ -48,8 +61,8 @@ function useSalary(defaultValue = 12) {
 
 function Panel({ title, children }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">{title}</h2>
+    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/90">
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">{title}</h2>
       {children}
     </section>
   );
@@ -69,8 +82,8 @@ function MessageBubble({ role, text }) {
       <div
         className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow transition-all duration-300 ${
           isUser
-            ? "bg-ink text-white rounded-br-md shadow-[0_12px_26px_-14px_rgba(17,24,39,0.9)]"
-            : "bg-white text-slate-900 rounded-bl-md border border-slate-200 shadow-[0_16px_30px_-22px_rgba(2,132,199,0.5)]"
+            ? "bg-ink text-white rounded-br-md shadow-[0_12px_26px_-14px_rgba(17,24,39,0.9)] dark:bg-cyan-700"
+            : "bg-white text-slate-900 rounded-bl-md border border-slate-200 shadow-[0_16px_30px_-22px_rgba(2,132,199,0.5)] dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
         }`}
       >
         {isUser ? text : <div className="markdown-content" dangerouslySetInnerHTML={{ __html: html }} />}
@@ -85,12 +98,12 @@ function ThinkingBubble() {
       <div className="grid h-8 w-8 shrink-0 place-content-center rounded-full bg-gradient-to-br from-cyan-600 to-blue-600 text-xs font-bold text-white shadow">
         AI
       </div>
-      <div className="rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 shadow">
-        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">Thinking...</div>
-        <div className="flex items-center gap-1 text-slate-500">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-slate-400" />
-          <span className="h-2 w-2 animate-pulse rounded-full bg-slate-400 [animation-delay:150ms]" />
-          <span className="h-2 w-2 animate-pulse rounded-full bg-slate-400 [animation-delay:300ms]" />
+      <div className="rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 shadow dark:border-slate-700 dark:bg-slate-900">
+        <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">Thinking...</div>
+        <div className="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-slate-400 dark:bg-slate-500" />
+          <span className="h-2 w-2 animate-pulse rounded-full bg-slate-400 dark:bg-slate-500 [animation-delay:150ms]" />
+          <span className="h-2 w-2 animate-pulse rounded-full bg-slate-400 dark:bg-slate-500 [animation-delay:300ms]" />
         </div>
       </div>
     </div>
@@ -99,9 +112,9 @@ function ThinkingBubble() {
 
 function ActionCard({ title, description, to, buttonText, colorClass }) {
   return (
-    <article className="group rounded-2xl border border-white/50 bg-white/80 p-4 shadow-panel backdrop-blur transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_50px_-26px_rgba(15,23,42,0.55)]">
-      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-sm text-slate-600">{description}</p>
+    <article className="group rounded-2xl border border-white/50 bg-white/80 p-4 shadow-panel backdrop-blur transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_50px_-26px_rgba(15,23,42,0.55)] dark:border-slate-700/70 dark:bg-slate-900/80 dark:shadow-[0_28px_50px_-26px_rgba(8,47,73,0.6)]">
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{description}</p>
       <Link to={to} className={`mt-4 inline-block rounded-xl px-4 py-2 text-sm font-semibold text-white transition group-hover:scale-[1.02] ${colorClass}`}>
         {buttonText}
       </Link>
@@ -112,21 +125,46 @@ function ActionCard({ title, description, to, buttonText, colorClass }) {
 function PageShell({ title, subtitle, children }) {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-4 p-4 md:p-6 animate-rise">
-      <header className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-5 shadow-panel backdrop-blur md:p-6">
+      <header className="relative overflow-hidden rounded-3xl border border-white/40 bg-white/70 p-5 shadow-panel backdrop-blur md:p-6 dark:border-slate-700/60 dark:bg-slate-900/75">
         <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-cyan-200/70 blur-2xl" />
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-slate-500">Placement AI Copilot</p>
-            <h1 className="text-2xl font-bold md:text-3xl">{title}</h1>
-            <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Placement AI Copilot</p>
+            <h1 className="text-2xl font-bold text-slate-900 md:text-3xl dark:text-slate-100">{title}</h1>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{subtitle}</p>
           </div>
-          <Link to="/" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <Link to="/" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">
             Back to Home
           </Link>
         </div>
       </header>
       {children}
     </main>
+  );
+}
+
+function ThemeToggle({ theme, onToggle }) {
+  const isDark = theme === "dark";
+  return (
+    <button
+      onClick={onToggle}
+      className="fixed right-4 top-4 z-50 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white/90 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-700 shadow-md backdrop-blur transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-900/90 dark:text-slate-100 dark:hover:bg-slate-800"
+      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+      title={`Switch to ${isDark ? "light" : "dark"} mode`}
+    >
+      <span aria-hidden="true">{isDark ? "☀" : "☾"}</span>
+      <span>{isDark ? "Light" : "Dark"}</span>
+    </button>
+  );
+}
+
+function LiveBackground() {
+  return (
+    <div className="live-bg" aria-hidden="true">
+      <span className="live-bg-orb live-bg-orb-a" />
+      <span className="live-bg-orb live-bg-orb-b" />
+      <span className="live-bg-orb live-bg-orb-c" />
+    </div>
   );
 }
 
@@ -228,14 +266,14 @@ function HomePage() {
       <div className="pointer-events-none absolute -left-20 top-8 h-40 w-40 animate-float-slow rounded-full bg-cyan-300/45 blur-3xl" />
       <div className="pointer-events-none absolute right-0 top-24 h-48 w-48 animate-float-fast rounded-full bg-blue-200/50 blur-3xl" />
 
-      <header className="relative rounded-3xl border border-white/40 bg-white/70 p-4 shadow-panel backdrop-blur md:p-6 animate-rise">
+      <header className="relative rounded-3xl border border-white/40 bg-white/70 p-4 shadow-panel backdrop-blur md:p-6 animate-rise dark:border-slate-700/60 dark:bg-slate-900/75">
         <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-cyan-700">
           Live Chat Workspace
           <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-500" />
         </div>
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-slate-500">Placement AI Copilot</p>
-        <h1 className="mt-1 text-2xl font-bold md:text-4xl">Ask Naturally, Plan Precisely</h1>
-        <p className="mt-1 text-sm text-slate-600">A focused chatbot interface with quick tools for roadmap, daily prep, and resume improvement.</p>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Placement AI Copilot</p>
+        <h1 className="mt-1 text-2xl font-bold text-slate-900 md:text-4xl dark:text-slate-100">Ask Naturally, Plan Precisely</h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">A focused chatbot interface with quick tools for roadmap, daily prep, and resume improvement.</p>
       </header>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -245,23 +283,23 @@ function HomePage() {
         <ActionCard title="Resume Analyzer" description="Upload resume and receive actionable analysis for placement readiness." to="/resume" buttonText="Open Resume Page" colorClass="bg-orange-500 hover:bg-orange-600" />
       </section>
 
-      <section className="rounded-3xl border border-white/40 bg-white/70 shadow-panel backdrop-blur animate-rise">
+      <section className="rounded-3xl border border-white/40 bg-white/70 shadow-panel backdrop-blur animate-rise dark:border-slate-700/60 dark:bg-slate-900/75">
         <div className="flex min-h-[50vh] flex-col">
-          <div className="border-b border-slate-200/80 bg-white/60 px-4 py-3 md:px-6">
+          <div className="border-b border-slate-200/80 bg-white/60 px-4 py-3 md:px-6 dark:border-slate-700 dark:bg-slate-900/80">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold">Mentor Chat</p>
-                <p className="text-xs text-slate-500">Status: {status}</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">Mentor Chat</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Status: {status}</p>
               </div>
-              <button onClick={clearChatHistory} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100">
+              <button onClick={clearChatHistory} className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">
                 Clear History
               </button>
             </div>
           </div>
-          <div className="chat-scroll flex-1 space-y-3 overflow-y-auto bg-gradient-to-b from-white/20 to-cyan-50/20 px-4 py-4 md:px-6">
+          <div className="chat-scroll flex-1 space-y-3 overflow-y-auto bg-gradient-to-b from-white/20 to-cyan-50/20 px-4 py-4 md:px-6 dark:from-slate-900/20 dark:to-cyan-950/20">
             <div className="mb-2 flex flex-wrap gap-2">
               {["Give me a 30-day DSA sprint", "Review my interview weak spots", "How to target 15 LPA in 6 months"].map((prompt) => (
-                <button key={prompt} onClick={() => setChatInput(prompt)} className="rounded-full border border-slate-300/90 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-cyan-300 hover:text-cyan-700">
+                <button key={prompt} onClick={() => setChatInput(prompt)} className="rounded-full border border-slate-300/90 bg-white px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-cyan-300 hover:text-cyan-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-cyan-500 dark:hover:text-cyan-300">
                   {prompt}
                 </button>
               ))}
@@ -270,7 +308,7 @@ function HomePage() {
             {isLoading && <ThinkingBubble />}
             <div ref={chatEndRef} />
           </div>
-          <div className="border-t border-slate-200/80 bg-white/70 p-3 md:p-4">
+          <div className="border-t border-slate-200/80 bg-white/70 p-3 md:p-4 dark:border-slate-700 dark:bg-slate-900/80">
             <div className="flex items-end gap-2">
               <textarea
                 value={chatInput}
@@ -283,7 +321,7 @@ function HomePage() {
                 }}
                 placeholder="Ask about DSA plan, resume gaps, or interview strategy..."
                 rows="2"
-                className="min-h-[52px] flex-1 resize-none rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-cyan-400 transition focus:ring"
+                className="min-h-[52px] flex-1 resize-none rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none ring-cyan-400 transition focus:ring dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
               />
               <button onClick={sendMessage} disabled={isLoading} className="rounded-2xl bg-gradient-to-r from-slate-900 to-cyan-700 px-5 py-3 text-sm font-semibold text-white transition hover:scale-[1.02] hover:opacity-95 disabled:opacity-60">
                 Send
@@ -323,15 +361,15 @@ function RoadmapPage() {
     <PageShell title="Basic Roadmap" subtitle="Dedicated page for structured placement roadmap output.">
       <Panel title="Inputs">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <label className="flex-1 text-sm text-slate-700">
+          <label className="flex-1 text-sm text-slate-700 dark:text-slate-200">
             Target CTC (LPA)
-            <input type="number" value={salary} onChange={(e) => setSalary(e.target.value)} min="1" className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
+            <input type="number" value={salary} onChange={(e) => setSalary(e.target.value)} min="1" className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100" />
           </label>
           <button onClick={generate} className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white">Generate</button>
         </div>
-        <p className="mt-2 text-xs text-slate-500">Status: {status}</p>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Status: {status}</p>
       </Panel>
-      <Panel title="Roadmap Result"><pre className="whitespace-pre-wrap font-mono text-sm text-slate-800">{result || "No result yet."}</pre></Panel>
+      <Panel title="Roadmap Result"><pre className="whitespace-pre-wrap font-mono text-sm text-slate-800 dark:text-slate-100">{result || "No result yet."}</pre></Panel>
     </PageShell>
   );
 }
@@ -356,16 +394,16 @@ function AIRoadmapPage() {
     <PageShell title="AI Roadmap" subtitle="Dedicated page for AI-generated preparation plans.">
       <Panel title="Inputs">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <label className="flex-1 text-sm text-slate-700">
+          <label className="flex-1 text-sm text-slate-700 dark:text-slate-200">
             Target CTC (LPA)
-            <input type="number" value={salary} onChange={(e) => setSalary(e.target.value)} min="1" className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
+            <input type="number" value={salary} onChange={(e) => setSalary(e.target.value)} min="1" className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100" />
           </label>
           <button onClick={generate} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white">Generate</button>
         </div>
-        <p className="mt-2 text-xs text-slate-500">Status: {status}</p>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Status: {status}</p>
       </Panel>
       <Panel title="AI Roadmap Result">
-        {result ? <div className="markdown-content text-sm text-slate-800" dangerouslySetInnerHTML={{ __html: renderMarkdown(result) }} /> : <p className="font-mono text-sm text-slate-800">No result yet.</p>}
+        {result ? <div className="markdown-content text-sm text-slate-800 dark:text-slate-100" dangerouslySetInnerHTML={{ __html: renderMarkdown(result) }} /> : <p className="font-mono text-sm text-slate-800 dark:text-slate-100">No result yet.</p>}
       </Panel>
     </PageShell>
   );
@@ -391,15 +429,15 @@ function DailyPage() {
     <PageShell title="Daily Tasks" subtitle="Dedicated page for your day-by-day prep checklist.">
       <Panel title="Inputs">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-          <label className="flex-1 text-sm text-slate-700">
+          <label className="flex-1 text-sm text-slate-700 dark:text-slate-200">
             Target CTC (LPA)
-            <input type="number" value={salary} onChange={(e) => setSalary(e.target.value)} min="1" className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2" />
+            <input type="number" value={salary} onChange={(e) => setSalary(e.target.value)} min="1" className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100" />
           </label>
           <button onClick={generate} className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">Generate</button>
         </div>
-        <p className="mt-2 text-xs text-slate-500">Status: {status}</p>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Status: {status}</p>
       </Panel>
-      <Panel title="Daily Tasks Result"><pre className="whitespace-pre-wrap font-mono text-sm text-slate-800">{result || "No result yet."}</pre></Panel>
+      <Panel title="Daily Tasks Result"><pre className="whitespace-pre-wrap font-mono text-sm text-slate-800 dark:text-slate-100">{result || "No result yet."}</pre></Panel>
     </PageShell>
   );
 }
@@ -431,27 +469,43 @@ function ResumePage() {
     <PageShell title="Resume Analyzer" subtitle="Dedicated page for resume upload and feedback.">
       <Panel title="Upload Resume">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm" />
+          <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100" />
           <button onClick={analyze} className="rounded-xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white">Analyze</button>
         </div>
-        <p className="mt-2 text-xs text-slate-500">Status: {status}</p>
+        <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Status: {status}</p>
       </Panel>
       <Panel title="Resume Analysis Result">
-        {result ? <div className="markdown-content text-sm text-slate-800" dangerouslySetInnerHTML={{ __html: renderMarkdown(result) }} /> : <p className="font-mono text-sm text-slate-800">No result yet.</p>}
+        {result ? <div className="markdown-content text-sm text-slate-800 dark:text-slate-100" dangerouslySetInnerHTML={{ __html: renderMarkdown(result) }} /> : <p className="font-mono text-sm text-slate-800 dark:text-slate-100">No result yet.</p>}
       </Panel>
     </PageShell>
   );
 }
 
 export default function App() {
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle("dark", theme === "dark");
+    localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  }
+
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/roadmap" element={<RoadmapPage />} />
-      <Route path="/ai-roadmap" element={<AIRoadmapPage />} />
-      <Route path="/daily" element={<DailyPage />} />
-      <Route path="/resume" element={<ResumePage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <LiveBackground />
+      <ThemeToggle theme={theme} onToggle={toggleTheme} />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/roadmap" element={<RoadmapPage />} />
+        <Route path="/ai-roadmap" element={<AIRoadmapPage />} />
+        <Route path="/daily" element={<DailyPage />} />
+        <Route path="/resume" element={<ResumePage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }

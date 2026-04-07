@@ -8,12 +8,122 @@
 
 body {
   margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, #f1f5f9 0%, #eff6ff 45%, #cffafe 100%);
+  color: #0f172a;
+  transition: background 250ms ease, color 250ms ease;
+}
+
+#root {
+  position: relative;
+  isolation: isolate;
+}
+
+.live-bg {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.live-bg::before {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  background-image:
+    linear-gradient(rgba(14, 116, 144, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px);
+  background-size: 42px 42px;
+  animation: driftGrid 22s linear infinite;
+}
+
+.live-bg-orb {
+  position: absolute;
+  width: 36vw;
+  height: 36vw;
+  min-width: 260px;
+  min-height: 260px;
+  border-radius: 999px;
+  filter: blur(54px);
+  opacity: 0.35;
+  mix-blend-mode: screen;
+}
+
+.live-bg-orb-a {
+  left: -8vw;
+  top: 12vh;
+  background: radial-gradient(circle at 30% 35%, #67e8f9 0%, rgba(14, 116, 144, 0.08) 72%);
+  animation: floatOrbA 16s ease-in-out infinite;
+}
+
+.live-bg-orb-b {
+  right: -10vw;
+  top: 6vh;
+  background: radial-gradient(circle at 65% 40%, #93c5fd 0%, rgba(37, 99, 235, 0.08) 70%);
+  animation: floatOrbB 18s ease-in-out infinite;
+}
+
+.live-bg-orb-c {
+  left: 28vw;
+  bottom: -12vh;
+  background: radial-gradient(circle at 50% 50%, #7dd3fc 0%, rgba(6, 182, 212, 0.06) 70%);
+  animation: floatOrbC 20s ease-in-out infinite;
+}
+
+html.dark body {
+  background:
+    radial-gradient(circle at 12% 15%, rgba(14, 116, 144, 0.2), transparent 35%),
+    radial-gradient(circle at 80% 12%, rgba(30, 64, 175, 0.18), transparent 36%),
+    linear-gradient(135deg, #020617 0%, #0f172a 55%, #082f49 100%);
+  color: #e2e8f0;
+}
+
+html.dark .live-bg::before {
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.08) 1px, transparent 1px);
+}
+
+html.dark .live-bg-orb {
+  opacity: 0.28;
+}
+
+@keyframes driftGrid {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-24px, 16px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes floatOrbA {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(4vw, -3vh, 0) scale(1.08); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes floatOrbB {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-5vw, 4vh, 0) scale(0.94); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes floatOrbC {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(3vw, -4vh, 0) scale(1.06); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 
 .ui-grid {
   background-image:
     radial-gradient(circle at 10% 10%, rgba(186, 230, 253, 0.25), transparent 35%),
     radial-gradient(circle at 90% 20%, rgba(219, 234, 254, 0.35), transparent 30%);
+}
+
+html.dark .ui-grid {
+  background-image:
+    radial-gradient(circle at 10% 10%, rgba(8, 145, 178, 0.2), transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(37, 99, 235, 0.2), transparent 35%);
 }
 
 @keyframes floatSlow {
@@ -46,6 +156,13 @@ body {
   color: #0f172a;
 }
 
+html.dark .markdown-content h1,
+html.dark .markdown-content h2,
+html.dark .markdown-content h3,
+html.dark .markdown-content h4 {
+  color: #e2e8f0;
+}
+
 .markdown-content p {
   margin: 0 0 10px;
 }
@@ -72,12 +189,21 @@ body {
   font-size: 12px;
 }
 
+html.dark .markdown-content code {
+  background: #1e293b;
+}
+
 .markdown-content pre {
   overflow-x: auto;
   border-radius: 10px;
   background: #0f172a;
   padding: 10px;
   color: #e2e8f0;
+}
+
+html.dark .markdown-content pre {
+  background: #020617;
+  color: #cbd5e1;
 }
 
 .markdown-content pre code {
@@ -92,6 +218,10 @@ body {
   text-underline-offset: 2px;
 }
 
+html.dark .markdown-content a {
+  color: #22d3ee;
+}
+
 .chat-scroll::-webkit-scrollbar {
   width: 10px;
 }
@@ -103,4 +233,8 @@ body {
 .chat-scroll::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 999px;
+}
+
+html.dark .chat-scroll::-webkit-scrollbar-thumb {
+  background: #334155;
 }
